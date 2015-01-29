@@ -1,0 +1,1276 @@
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 1
+b.ASM
+
+
+
+      1				     ; Batalha naval
+      2	0000			     .model small
+      3	0000			     .stack 100h
+      4	0000			     .data
+      5	0000  DA 16*(C4) BF		     tableTop1 db	     218, 22 dup(196), 191
+      6	0018  B3 20 20 20 4D 61	74+	     tableTitleTiros db	     179, "   Matriz de	tiros	 ", 179
+      7	      72 69 7A 20 64 65	20+
+      8	      74 69 72 6F 73 20	20+
+      9	      20 20 B3
+     10	0030  B3 20 20 20 4D 61	74+	     tableTitleNavios db 179, "	  Matriz de navios   ",	179
+     11	      72 69 7A 20 64 65	20+
+     12	      6E 61 76 69 6F 73	20+
+     13	      20 20 B3
+     14	0048  C3 16*(C4) B4		     tableTop2 db	     195, 22 dup(196), 180
+     15	0060  20 20 30 20 31 20	32+	     tableNumberLine db	     "	0 1 2 3	4 5 6 7	8 9 "
+     16	      20 33 20 34 20 35	20+
+     17	      36 20 37 20 38 20	39+
+     18	      20
+     19	0076  C0 16*(C4) D9		     tableBottom db	     192, 22 dup(196), 217
+     20	008E  B3 20 20 20 52 65	73+	     tableTitleRes db	     179, "   Resultado", 10 dup(' '), 179
+     21	      75 6C 74 61 64 6F	  +
+     22	      0A*(20) B3
+     23	00A6  56 6F 63 65 11*(20)	     resultadoTitle1 db		     "Voce", 17	dup(' ')
+     24	00BB  20 20 54 69 72 6F	73+	     resultadoTiros db		     "	Tiros:	     0", 5 dup(' ')
+     25	      3A 20 20 20 20 20	20+
+     26	      20 30 05*(20)
+     27	00D0  20 20 41 63 65 72	74+	     resultadoAcertos db     "	Acertos:     0", 5 dup(' ')
+     28	      6F 73 3A 20 20 20	20+
+     29	      20 30 05*(20)
+     30	00E5  20 20 41 66 75 6E	64+	     resultadoAfundados	db   "	Afundados:   0", 5 dup(' ')
+     31	      61 64 6F 73 3A 20	20+
+     32	      20 30 05*(20)
+     33	00FA  41 64 76 65 72 73	61+	     resultadoTitle2 db		     "Adversario", 11 dup(' ')
+     34	      72 69 6F 0B*(20)
+     35	010F  20 20 55 6C 74 69	6D+	     resultadoUltTiro db     "	Ultimo tiro: 0", 5 dup(' ')
+     36	      6F 20 74 69 72 6F	3A+
+     37	      20 30 05*(20)
+     38	0124  DA 46*(C4) BF		     tableDownTop db	     218, 70 dup(196), 191
+     39	016C  C0 46*(C4) D9		     tableDownBottom db	     192, 70 dup(196), 217
+     40	01B4  C3 46*(C4) B4		     tableDownMiddle db	     195, 70 dup(196), 180
+     41	01FC  4D 65 6E 73 61 67	65+	     titleMensagem db	     "Mensagem:"
+     42	      6D 3A
+     43	0205  50 6F 72 74 61 20	42+	     titlePortaB db	     "Porta B  "
+     44	      20 20
+     45	020E  50 6F 72 74 61 20	43+	     titlePortaC db	     "Porta C  "
+     46	      20 20
+     47	0217  54 69 72 6F 20 20	20+	     titleTiro db	     "Tiro     "
+     48	      20 20
+     49	0220  15*(20)			     empty db 21 dup(' ')
+     50	0235  50 6F 72 74 61 20	61+	     embarcacaoA db "Porta avioes   "
+     51	      76 69 6F 65 73 20	20+
+     52	      20
+     53	0244  4E 61 76 69 6F 20	64+	     embarcacaoB db "Navio de guerra"
+     54	      65 20 67 75 65 72	72+
+     55	      61
+     56	0253  53 75 62 6D 61 72	69+	     embarcacaoS db "Submarino	    "
+     57	      6E 6F 20 20 20 20	20+
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 2
+b.ASM
+
+
+
+     58	      20
+     59	0262  44 65 73 74 72 6F	79+	     embarcacaoD db "Destroyer	    "
+     60	      65 72 20 20 20 20	20+
+     61	      20
+     62	0271  42 61 72 63 6F 20	70+	     embarcacaoP db "Barco patrulha "
+     63	      61 74 72 75 6C 68	61+
+     64	      20
+     65	0280  44 69 67 69 74 65	20+	     mensagemErroLoadNavioPosicao db	     "Digite V para vertical ou	H para horizontal", +
+     66	      56 20 70 61 72 61	20+  7 dup(' ')
+     67	      76 65 72 74 69 63	61+
+     68	      6C 20 6F 75 20 48	20+
+     69	      70 61 72 61 20 68	6F+
+     70	      72 69 7A 6F 6E 74	61+
+     71	      6C 07*(20)
+     72	02B2  44 69 67 69 74 65	20+	     mensagemErroLoadNavioLimite db	     "Digite uma posicao valida", 25 dup(' ')
+     73	      75 6D 61 20 70 6F	73+
+     74	      69 63 61 6F 20 76	61+
+     75	      6C 69 64 61 19*(20)
+     76	02E4  43 6F 6F 72 64 65	6E+	     mensagemErroTiroEnvia db			     "Coordenada do tiro invalida", 23 dup('+
+     77	      61 64 61 20 64 6F	20+  ')
+     78	      74 69 72 6F 20 69	6E+
+     79	      76 61 6C 69 64 61	  +
+     80	      17*(20)
+     81	0316  53 75 61 20 76 65	7A+	     mensagemTiroEnvia db			     "Sua vez de jogar", 34 dup(' ')
+     82	      20 64 65 20 6A 6F	67+
+     83	      61 72 22*(20)
+     84	0348  41 67 75 61 72 64	65+	     mensagemTiroRecebe	db			     "Aguarde adversario jogar", 26 dup(' ')
+     85	      20 61 64 76 65 72	73+
+     86	      61 72 69 6F 20 6A	6F+
+     87	      67 61 72 1A*(20)
+     88	037A  56 6F 63 65 20 67	61+	     mensagemEndGameGanhou db			     "Voce ganhou", 39 dup(' ')
+     89	      6E 68 6F 75 27*(20)
+     90	03AC  56 6F 63 65 20 70	65+	     mensagemEndGamePerdeu db			     "Voce perdeu", 39 dup(' ')
+     91	      72 64 65 75 27*(20)
+     92	03DE  0005			     lengthA dw	5
+     93	03E0  0004			     lengthB dw	4
+     94	03E2  0003			     lengthS dw	3
+     95	03E4  0003			     lengthD dw	3
+     96	03E6  0002			     lengthP dw	2
+     97	03E8  00			     resTiros db 0
+     98	03E9  00			     resAcertos	db 0
+     99	03EA  00			     resAfundados db 0
+    100	03EB  00			     resAdvTiros db 0
+    101	03EC  00			     resAdvAcertos db 0
+    102	03ED  00			     resAdvAfundados db	0
+    103	03EE			     .code
+    104
+    105	0000			     EXIT proc ; termina o programa
+    106	0000  B0 00			     mov al, 0
+    107	0002  E8 0077			     call MUDA_PAGINA
+    108	0005  B4 4C			     mov ah, 4ch     ; prepara o fim do	programa
+    109	0007  CD 21			     int 21h	     ; sinaliza	o DOS
+    110	0009  C3			     ret
+    111	000A			     endp
+    112
+    113	000A			     QUEBRA_LINHA proc ; quebra	linha
+    114	000A  52			     push dx
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 3
+b.ASM
+
+
+
+    115	000B  BA 000D			     mov dx, 13	; new line
+    116	000E  E8 0008			     call ESC_CHAR_21
+    117	0011  BA 000A			     mov dx, 10	; carriage return
+    118	0014  E8 0002			     call ESC_CHAR_21
+    119	0017  5A			     pop dx
+    120	0018  C3			     ret
+    121	0019			     endp
+    122
+    123	0019			     ESC_CHAR_21 proc ;	escreve	char ascii de dx
+    124	0019  50			     push ax
+    125	001A  B4 02			     mov ah, 02
+    126	001C  CD 21			     int 21h
+    127	001E  58			     pop ax
+    128	001F  C3			     ret
+    129	0020			     endp
+    130
+    131	0020			     ESC_STRING_21 proc	; escreve string a partir do endereco de dx, ate caracter $
+    132	0020  50			     push ax
+    133	0021  B4 09			     mov ah, 09
+    134	0023  CD 21			     int 21h
+    135	0025  58			     pop ax
+    136	0026  C3			     ret
+    137	0027			     endp
+    138
+    139	0027			     ESC_INT_21	proc ; escreve numero de ax
+    140	0027  50			     push ax
+    141	0028  53			     push bx
+    142	0029  52			     push dx
+    143	002A  51			     push cx
+    144	002B  BB 000A			     mov bx, 10
+    145	002E  33 C9			     xor cx, cx
+    146	0030  33 D2			     DIVIDE: xor dx, dx
+    147	0032  F7 F3				     div bx
+    148	0034  80 C2 30				     add dl, '0' ; transforma de numero	para caracter ascii
+    149	0037  52				     push dx
+    150	0038  41				     inc cx
+    151	0039  0B C0				     or	ax, ax
+    152	003B  75 F3			     jnz DIVIDE
+    153	003D  5A			     LACO2: pop	dx
+    154	003E  E8 FFD8				     call ESC_CHAR_21
+    155	0041  E2 FA			     loop LACO2
+    156	0043  59			     pop cx
+    157	0044  5A			     pop dx
+    158	0045  5B			     pop bx
+    159	0046  58			     pop ax
+    160	0047  C3			     ret
+    161	0048			     endp
+    162
+    163	0048			     WRITE_HEX PROC ;Este procedimento converte	para hexadecimal o byte	armazenado no registrador DL+
+    164				     e mostra o	dígito
+    165	0048  51			     push CX ;coloca na	pilha o	valor do registrador CX
+    166	0049  52			     push DX ;coloca na	pilha o	valor do registrador DX
+    167	004A  8A F2			     mov DH, DL	;move o	valor de DL para o registrador DH
+    168	004C  B9 0004			     mov CX, 4 ;move o valor 4 para o registrador CX
+    169	004F  D2 EA			     shr DL, CL
+    170	0051  E8 000B			     call WRITE_HEX_DIGIT ;mostra na tela o primeiro número hexadecimal
+    171	0054  8A D6			     mov  DL, DH ;move o valor de DH para o registrador	DL
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 4
+b.ASM
+
+
+
+    172	0056  80 E2 0F			     and  DL, 0Fh
+    173	0059  E8 0003			     call WRITE_HEX_DIGIT ;mostra na tela o segundo número hexadecimal
+    174	005C  5A			     pop  DX ;retira da	pilha o	valor do registrador DX
+    175	005D  59			     pop  CX ;retira da	pilha o	valor do registrador CX
+    176	005E  C3			     ret ;retorna o controle ao	procedimento que chamou
+    177	005F			     ENDP
+    178
+    179	005F			     WRITE_HEX_DIGIT PROC ;Este	procedimento converte os 4 bits	mais baixos do registrador DL para  +
+    180				     um	número hexadecimal e o mostra na tela do computador
+    181	005F  52			     push DX ;coloca na	pilha o	valor de DX
+    182	0060  80 FA 0A			     cmp DL, 10	;compara se número de bits é menor que 10
+    183	0063  73 05			     jae HEX_LETTER ;se	não, salta para	HEX_LETER
+    184	0065  80 C2 30			     add DL, "0" ;se sim, converte para	número
+    185	0068  EB 03			     jmp Short WRITE_DIGIT ;escreve o caracter
+    186	006A  80 C2 37			     HEX_LETTER: add DL,"A"-10 ;converte um caracter para hexadecimal
+    187	006D  E8 FFA9			     WRITE_DIGIT: call ESC_CHAR_21 ;imprime o caracter na tela
+    188	0070  5A			     pop  DX ;Retorna o	valor inicial do registrador DX	para o registrador DL
+    189	0071  C3			     ret ;Retorna o controle ao	procedimento que chamou
+    190	0072			     ENDP
+    191
+    192	0072			     LE_CHAR_SEM_ECO proc ; le caracter	sem escrever na	tela, retorna em al
+    193	0072  B4 07			     mov ah, 07
+    194	0074  CD 21			     int 21h
+    195	0076  C3			     ret
+    196	0077			     endp
+    197
+    198	0077			     LE_CHAR proc ; le caracter	e escrever na tela, retorna em al
+    199	0077  B4 01			     mov ah, 01
+    200	0079  CD 21			     int 21h
+    201	007B  C3			     ret
+    202	007C			     endp
+    203
+    204	007C			     MUDA_PAGINA proc ;	muda a pagina, o numero	da pagina definido em al
+    205	007C  50			     push ax
+    206	007D  B4 05			     mov ah, 05h ; numero do servico de	BIOS
+    207	007F  CD 10			     int 10h
+    208	0081  58			     pop ax
+    209	0082  C3			     ret
+    210	0083			     endp
+    211
+    212	0083			     DEFINE_MODO proc ;	define modo
+    213	0083  50			 push ax
+    214	0084  B0 03			 mov al, 03h ; modo texto 80 x 25
+    215	0086  B4 00			 mov ah, 00h ; modo de video
+    216	0088  CD 10			 int 10h
+    217	008A  58			 pop ax
+    218	008B  C3			 ret
+    219	008C			     endp
+    220
+    221	008C			     LE_CHAR_VIDEO proc	; le caracter do video,	retorna	em al o	caracter ascii e ah os atributos cor
+    222	008C  53			     push bx
+    223	008D  B7 01			     mov bh, 1 ; pagina
+    224	008F  B4 08			     mov ah, 08	; numero do servico de BIOS
+    225	0091  CD 10			     int 10h ; posiciona cursor
+    226	0093  5B			     pop bx
+    227	0094  C3			     ret
+    228	0095			     endp
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 5
+b.ASM
+
+
+
+    229
+    230	0095			     MOV_CURSOR	proc ; move o cursor dh=linha dl=coluna
+    231	0095  50			     push ax
+    232	0096  53			     push bx
+    233	0097  B7 01			     mov bh, 1 ; pagina
+    234	0099  B4 02			     mov ah, 02	; numero do servico de BIOS
+    235	009B  CD 10			     int 10h ; posiciona cursor
+    236	009D  5B			     pop bx
+    237	009E  58			     pop ax
+    238	009F  C3			     ret
+    239	00A0			     endp
+    240
+    241	00A0			     ESC_CHAR proc ; escreve char com atributo pelo servico de video do	bios, escreve caracter de al
+    242					     ; bl atributo cor - 4 bits: intensidade, red, green, blue
+    243	00A0  50			     push ax
+    244	00A1  53			     push bx
+    245	00A2  51			     push cx
+    246	00A3  52			     push dx
+    247	00A4  B7 01			     mov bh, 1 ; pagina	ou cor do segundo plano
+    248	00A6  B9 0001			     mov cx, 1 ; numero	de repeticoes
+    249	00A9  B4 09			     mov ah, 09h ; numero do servico de	BIOS
+    250	00AB  CD 10			     int 10h
+    251	00AD  5A			     pop dx
+    252	00AE  59			     pop cx
+    253	00AF  5B			     pop bx
+    254	00B0  58			     pop ax
+    255	00B1  C3			     ret
+    256	00B2			     endp
+    257
+    258	00B2			     ESC_STRING	proc ; escreve string pelo servico de video do bios, escreve string iniciada em	    +
+    259				     ES:BP, comprimento	cx
+    260					     ; coordenadas da tela em dx, dh = linha, dl = coluna - bl atributo	cor - 4	bits:	    +
+    261				     intensidade, red, green, blue
+    262	00B2  50			     push ax
+    263	00B3  53			     push bx
+    264	00B4  51			     push cx
+    265	00B5  52			     push dx
+    266	00B6  B7 01			     mov bh, 1 ; pagina
+    267	00B8  B4 13			     mov ah, 13h ; numero do servico de	BIOS
+    268	00BA  B0 00			     mov al, 00h ; numero do subservico
+    269	00BC  CD 10			     int 10h
+    270	00BE  5A			     pop dx
+    271	00BF  59			     pop cx
+    272	00C0  5B			     pop bx
+    273	00C1  58			     pop ax
+    274	00C2  C3			     ret
+    275	00C3			     endp
+    276
+    277	00C3			     PRINT_TABLE proc ;	escreve	borda da tabela
+    278	00C3  50			     push ax
+    279	00C4  53			     push bx
+    280	00C5  51			     push cx
+    281	00C6  52			     push dx
+    282
+    283	00C7  8A C2			     mov al, dl	; salva	coluna base
+    284	00C9  B6 00			     mov dh, 0 ; head
+    285	00CB  BD 0000r			     mov bp, offset tableTop1 ;	inicio
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 6
+b.ASM
+
+
+
+    286	00CE  E8 FFE1			     call ESC_STRING
+    287	00D1  B6 02			     mov dh, 2
+    288	00D3  BD 0048r			     mov bp, offset tableTop2
+    289	00D6  E8 FFD9			     call ESC_STRING
+    290	00D9  B6 0E			     mov dh, 14
+    291	00DB  BD 0076r			     mov bp, offset tableBottom
+    292	00DE  E8 FFD1			     call ESC_STRING
+    293	00E1  8A D0			     mov dl, al	; primeira linha
+    294	00E3  B6 03			     mov dh, 3
+    295	00E5  B9 000B			     mov cx, 11
+    296	00E8  50			     push ax ; salva a coluna base
+    297	00E9  B0 B3			     bordav1: mov al, 179
+    298	00EB  E8 FFA7				     call MOV_CURSOR
+    299	00EE  E8 FFAF				     call ESC_CHAR
+    300	00F1  80 C2 17				     add dl, 23	; move pra escrever segunda coluna
+    301	00F4  E8 FF9E				     call MOV_CURSOR
+    302	00F7  E8 FFA6				     call ESC_CHAR
+    303	00FA  80 EA 17				     sub dl, 23	; volta	pra escrever primeira coluna
+    304	00FD  B8 000A				     mov ax, 10	; escreve numeros verticais
+    305	0100  2A C1				     sub al, cl
+    306	0102  FE C2				     inc dl
+    307	0104  E8 FF8E				     call MOV_CURSOR
+    308	0107  E8 FF1D				     call ESC_INT_21
+    309	010A  FE CA				     dec dl
+    310	010C  FE C6				     inc dh
+    311	010E  E2 D9			     loop bordav1
+    312	0110  58			     pop ax
+    313	0111  8A D0			     mov dl, al
+    314	0113  FE C2			     inc dl
+    315	0115  B6 03			     mov dh, 3 ; escreve numeros horizontais
+    316	0117  BD 0060r			     mov bp, offset tableNumberLine
+    317	011A  B9 0015			     mov cx, 21
+    318	011D  E8 FF92			     call ESC_STRING
+    319
+    320	0120  5A			     pop dx
+    321	0121  59			     pop cx
+    322	0122  5B			     pop bx
+    323	0123  58			     pop ax
+    324	0124  C3			     ret
+    325	0125			     endp
+    326
+    327	0125			     PRINT_TABLES proc
+    328	0125  50			     push ax
+    329	0126  53			     push bx
+    330	0127  51			     push cx
+    331	0128  52			     push dx
+    332
+    333	0129  B8 0000s			     mov ax, @data ; escreve string
+    334	012C  8E C0			     mov es, ax
+    335	012E  B3 07			     mov bl, 7 ; cor branco nas	bordas
+    336	0130  B9 0018			     mov cx, 24	; tamanho
+    337					     ; tabela 1
+    338	0133  B2 00			     mov dl, 0 ; coluna	base
+    339	0135  B6 01			     mov dh, 1
+    340	0137  BD 0018r			     mov bp, offset tableTitleTiros
+    341	013A  E8 FF75			     call ESC_STRING
+    342	013D  E8 FF83			     call PRINT_TABLE
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 7
+b.ASM
+
+
+
+    343					     ; tabela 2
+    344	0140  B2 18			     mov dl, 24
+    345	0142  BD 0030r			     mov bp, offset tableTitleNavios
+    346	0145  E8 FF6A			     call ESC_STRING
+    347	0148  E8 FF78			     call PRINT_TABLE
+    348					     ; tabela resultados
+    349	014B  B2 31			     mov dl, 49
+    350	014D  BD 008Er			     mov bp, offset tableTitleRes
+    351	0150  E8 FF5F			     call ESC_STRING
+    352	0153  E8 FF6D			     call PRINT_TABLE
+    353	0156  B6 08			     mov dh, 8 ; linha divisao do resultado
+    354	0158  BD 0048r			     mov bp, offset tableTop2
+    355	015B  E8 FF54			     call ESC_STRING
+    356	015E  B9 0015			     mov cx, 21	; escreve conteudo dos resultados
+    357	0161  FE C2			     inc dl
+    358	0163  B6 03			     mov dh, 3 ; linhas	titulos
+    359	0165  BD 00A6r			     mov bp, offset resultadoTitle1
+    360	0168  E8 FF47			     call ESC_STRING
+    361	016B  B6 09			     mov dh, 9
+    362	016D  BD 00FAr			     mov bp, offset resultadoTitle2
+    363	0170  E8 FF3F			     call ESC_STRING
+    364	0173  FE C6			     inc dh ; linhas tiros
+    365	0175  BD 00BBr			     mov bp, offset resultadoTiros
+    366	0178  E8 FF37			     call ESC_STRING
+    367	017B  B6 04			     mov dh, 4
+    368	017D  E8 FF32			     call ESC_STRING
+    369	0180  FE C6			     inc dh ; linhas acertos
+    370	0182  BD 00D0r			     mov bp, offset resultadoAcertos
+    371	0185  E8 FF2A			     call ESC_STRING
+    372	0188  B6 0B			     mov dh, 11
+    373	018A  E8 FF25			     call ESC_STRING
+    374	018D  FE C6			     inc dh ; linhas afundados
+    375	018F  BD 00E5r			     mov bp, offset resultadoAfundados
+    376	0192  E8 FF1D			     call ESC_STRING
+    377	0195  B6 06			     mov dh, 6
+    378	0197  E8 FF18			     call ESC_STRING
+    379	019A  B6 0D			     mov dh, 13	; linha	ultimo tiro
+    380	019C  BD 010Fr			     mov bp, offset resultadoUltTiro
+    381	019F  E8 FF10			     call ESC_STRING
+    382	01A2  B6 07			     mov dh, 7
+    383	01A4  BD 0220r			     mov bp, offset empty
+    384	01A7  E8 FF08			     call ESC_STRING
+    385					     ; tabela inferior
+    386	01AA  B9 0048			     mov cx, 72
+    387	01AD  B2 00			     mov dl, 0
+    388	01AF  B6 17			     mov dh, 23
+    389	01B1  BD 016Cr			     mov bp, offset tableDownBottom
+    390	01B4  E8 FEFB			     call ESC_STRING
+    391	01B7  B6 11			     mov dh, 17
+    392	01B9  BD 0124r			     mov bp, offset tableDownTop
+    393	01BC  E8 FEF3			     call ESC_STRING
+    394	01BF  B9 0005			     mov cx, 5 ; bordar	laterais
+    395	01C2  FE C6			     inc dh
+    396	01C4  B0 B3			     bordaiv1: mov al, 179
+    397	01C6  E8 FECC				     call MOV_CURSOR
+    398	01C9  E8 FED4				     call ESC_CHAR
+    399	01CC  80 C2 47				     add dl, 71	; move pra escrever segunda coluna
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 8
+b.ASM
+
+
+
+    400	01CF  E8 FEC3				     call MOV_CURSOR
+    401	01D2  E8 FECB				     call ESC_CHAR
+    402	01D5  80 EA 47				     sub dl, 71	; volta	pra escrever primeira coluna
+    403	01D8  FE C6				     inc dh
+    404	01DA  E2 E8			     loop bordaiv1
+    405	01DC  B6 14			     mov dh, 20	; borda	horrizontal do meio
+    406	01DE  B2 00			     mov dl, 0
+    407	01E0  B9 0048			     mov cx, 72
+    408	01E3  BD 01B4r			     mov bp, offset tableDownMiddle
+    409	01E6  E8 FEC9			     call ESC_STRING
+    410	01E9  B9 0009			     mov cx, 9 ; titulos
+    411	01EC  B6 12			     mov dh, 18
+    412	01EE  B2 01			     mov dl, 1
+    413	01F0  BD 01FCr			     mov bp, offset titleMensagem
+    414	01F3  E8 FEBC			     call ESC_STRING
+    415	01F6  80 C6 03			     add dh, 3
+    416	01F9  BD 0205r			     mov bp, offset titlePortaB
+    417	01FC  E8 FEB3			     call ESC_STRING
+    418	01FF  80 C2 18			     add dl, 24
+    419	0202  BD 020Er			     mov bp, offset titlePortaC
+    420	0205  E8 FEAA			     call ESC_STRING
+    421	0208  80 C2 19			     add dl, 25
+    422	020B  BD 0217r			     mov bp, offset titleTiro
+    423	020E  E8 FEA1			     call ESC_STRING
+    424
+    425					     ; escreve conteudo	da tabela 1
+    426	0211  E8 0005			     call PRINT_CONTENT_MATRIZ
+    427
+    428	0214  5A			     pop dx
+    429	0215  59			     pop cx
+    430	0216  5B			     pop bx
+    431	0217  58			     pop ax
+    432	0218  C3			     ret
+    433	0219			     endp
+    434
+    435	0219			     PRINT_CONTENT_MATRIZ proc ; escreve conteudo da tabela 1
+    436	0219  50			     push ax
+    437	021A  53			     push bx
+    438	021B  51			     push cx
+    439	021C  52			     push dx
+    440
+    441	021D  B6 04			     mov dh, 4 ; bases
+    442	021F  B3 01			     mov bl, 1 ; cor azul
+    443	0221  B9 000A			     mov cx, 10
+    444	0224  B2 03			     MATRIZ_LACOI: mov dl, 3
+    445	0226  51				     push cx
+    446	0227  B9 000A				     mov cx, 10
+    447	022A  E8 FE68				     MATRIZ_LACOJ: call	MOV_CURSOR
+    448	022D  B0 FE					     mov al, 254
+    449	022F  E8 FE6E					     call ESC_CHAR
+    450	0232  80 C2 02					     add dl, 2
+    451	0235  E2 F3				     loop MATRIZ_LACOJ
+    452	0237  59				     pop cx
+    453	0238  FE C6				     inc dh
+    454	023A  E2 E8			     loop MATRIZ_LACOI
+    455
+    456	023C  5A			     pop dx
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 9
+b.ASM
+
+
+
+    457	023D  59			     pop cx
+    458	023E  5B			     pop bx
+    459	023F  58			     pop ax
+    460	0240  C3			     ret
+    461	0241			     endp
+    462
+    463	0241			     ESC_MENSAGEM proc ; escreve no campo mensagem, bp inicio da mensagem
+    464	0241  53			     push bx
+    465	0242  51			     push cx
+    466	0243  52			     push dx
+    467	0244  BA 1301			     mov dx, 1301h ; mensagem
+    468	0247  B9 002D			     mov cx, 45	; tamanho maximo
+    469	024A  B3 04			     mov bl, 4 ; cor
+    470	024C  E8 FE63			     call ESC_STRING
+    471	024F  5A			     pop dx
+    472	0250  59			     pop cx
+    473	0251  5B			     pop bx
+    474	0252  C3			     ret
+    475	0253			     endp
+    476
+    477	0253			     LOAD_NAVIO_VERIFICA proc ;	verifica posicao da embarcacao
+    478	0253  50			     push ax
+    479	0254  51			     push cx
+    480	0255  52			     push dx
+    481
+    482	0256  80 FB 48			     cmp bl, 'H'
+    483	0259  74 08			     jz	NAVIO_HORIZONTAL_VER
+    484	025B  80 FB 56			     cmp bl, 'V'
+    485	025E  74 15			     jz	NAVIO_VERTICAL_VER
+    486	0260  EB 25 90			     jmp LOAD_NAVIO_VERIFICA_FIM
+    487
+    488	0263  E8 FE2F			     NAVIO_HORIZONTAL_VER: call	MOV_CURSOR
+    489	0266  E8 FE23				     call LE_CHAR_VIDEO
+    490	0269  3C 20				     cmp al, ' '
+    491	026B  75 19				     jnz LOAD_NAVIO_VERIFICA_ERRO
+    492	026D  80 C2 02				     add dl, 2
+    493	0270  E2 F1			     loop NAVIO_HORIZONTAL_VER
+    494	0272  EB 13 90			     jmp LOAD_NAVIO_VERIFICA_FIM
+    495
+    496	0275  E8 FE1D			     NAVIO_VERTICAL_VER: call MOV_CURSOR
+    497	0278  E8 FE11				     call LE_CHAR_VIDEO
+    498	027B  3C 20				     cmp al, ' '
+    499	027D  75 07				     jnz LOAD_NAVIO_VERIFICA_ERRO
+    500	027F  FE C6				     inc dh
+    501	0281  E2 F2			     loop NAVIO_VERTICAL_VER
+    502	0283  EB 02 90			     jmp LOAD_NAVIO_VERIFICA_FIM
+    503
+    504	0286  F9			     LOAD_NAVIO_VERIFICA_ERRO: stc
+    505
+    506	0287				     LOAD_NAVIO_VERIFICA_FIM:
+    507	0287  5A			     pop dx
+    508	0288  59			     pop cx
+    509	0289  58			     pop ax
+    510	028A  C3			     ret
+    511	028B			     endp
+    512
+    513	028B			     LOAD_NAVIO	proc ; carrega navio pega o caracter do	ax e tamanho do	cx
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 10
+b.ASM
+
+
+
+    514	028B  50			     push ax
+    515	028C  53			     push bx
+    516	028D  51			     push cx
+    517	028E  52			     push dx
+    518
+    519	028F  BA 1332			     LOAD_NAVIO_ERRO: mov dx, 1332h ; posicao 19 x 50
+    520	0292  E8 FE00			     call MOV_CURSOR
+    521	0295  50			     push ax
+    522	0296  33 C0			     xor ax, ax
+    523	0298  E8 FDDC			     call LE_CHAR
+    524	029B  2C 30			     sub al, '0' ; transforma em numero
+    525	029D  50			     push ax
+    526	029E  FE C2			     inc dl
+    527	02A0  E8 FDD4			     call LE_CHAR
+    528	02A3  2C 30			     sub al, '0' ; transforma em numero
+    529	02A5  50			     push ax
+    530	02A6  FE C2			     inc dl
+    531	02A8  E8 FDCC			     call LE_CHAR
+    532	02AB  FE C2			     inc dl
+    533
+    534	02AD  8B D8			     mov bx, ax	; v ou h
+    535	02AF  58			     pop ax ; x
+    536	02B0  B4 02			     mov ah, 2
+    537	02B2  F6 E4			     mul ah ; deslocamento x2
+    538	02B4  04 1B			     add al, 27	; base
+    539	02B6  8A D0			     mov dl, al
+    540	02B8  58			     pop ax ; y
+    541	02B9  8A F0			     mov dh, al
+    542	02BB  80 C6 04			     add dh, 4 ; base
+    543
+    544	02BE  58			     pop ax ; caracter
+    545
+    546	02BF  E8 FF91			     call LOAD_NAVIO_VERIFICA ;	verificar posicao valida, retorna carry	flag = 1 se tiver   +
+    547				     erro
+    548	02C2  73 08			     jnc LOAD_NAVIO_CONTINUA
+    549	02C4  BD 02B2r			     mov bp, offset mensagemErroLoadNavioLimite
+    550	02C7  E8 FF77			     call ESC_MENSAGEM
+    551	02CA  EB C3			     jmp LOAD_NAVIO_ERRO
+    552
+    553	02CC  80 FB 48			     LOAD_NAVIO_CONTINUA: cmp bl, 'H'
+    554	02CF  74 0D			     jz	NAVIO_HORIZONTAL
+    555	02D1  80 FB 56			     cmp bl, 'V'
+    556	02D4  74 18			     jz	NAVIO_VERTICAL
+    557	02D6  BD 0280r			     mov bp, offset mensagemErroLoadNavioPosicao
+    558	02D9  E8 FF65			     call ESC_MENSAGEM
+    559	02DC  EB B1			     jmp LOAD_NAVIO_ERRO
+    560
+    561	02DE  E8 FDB4			     NAVIO_HORIZONTAL: call MOV_CURSOR
+    562	02E1  B3 07				     mov bl, 7
+    563	02E3  E8 FDBA				     call ESC_CHAR
+    564	02E6  80 C2 02				     add dl, 2
+    565	02E9  E2 F3			     loop NAVIO_HORIZONTAL
+    566	02EB  EB 0D 90			     jmp NAVIO_FIM
+    567
+    568	02EE  E8 FDA4			     NAVIO_VERTICAL: call MOV_CURSOR
+    569	02F1  B3 07				     mov bl, 7
+    570	02F3  E8 FDAA				     call ESC_CHAR
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 11
+b.ASM
+
+
+
+    571	02F6  FE C6				     inc dh
+    572	02F8  E2 F4			     loop NAVIO_VERTICAL
+    573
+    574	02FA				     NAVIO_FIM:
+    575	02FA  5A			     pop dx
+    576	02FB  59			     pop cx
+    577	02FC  5B			     pop bx
+    578	02FD  58			     pop ax
+    579	02FE  C3			     ret
+    580	02FF			     endp
+    581
+    582	02FF			     NAVIO_TITLE proc ;	escreve	titulo com posicao inicial em bp
+    583	02FF  53			     push bx
+    584	0300  51			     push cx
+    585	0301  52			     push dx
+    586
+    587	0302  B9 000F			     mov cx, 15
+    588	0305  B3 07			     mov bl, 7
+    589	0307  BA 1232			     mov dx, 1232h ; posicao 18	x 50
+    590	030A  E8 FDA5			     call ESC_STRING
+    591
+    592	030D  5A			     pop dx
+    593	030E  59			     pop cx
+    594	030F  5B			     pop bx
+    595	0310  C3			     ret
+    596	0311			     endp
+    597
+    598	0311			     INIT_NAVIOS proc ;	inicializa pedindo a posicao das navios
+    599	0311  50			     push ax
+    600	0312  53			     push bx
+    601	0313  51			     push cx
+    602	0314  52			     push dx
+    603
+    604	0315  BD 0235r			     mov bp, offset embarcacaoA
+    605	0318  E8 FFE4			     call NAVIO_TITLE
+    606	031B  B8 0041			     mov ax, 'A'
+    607	031E  BB 03DEr			     mov bx, offset lengthA
+    608	0321  8B 0F			     mov cx, [bx]
+    609	0323  E8 FF65			     call LOAD_NAVIO
+    610	0326  BD 0244r			     mov bp, offset embarcacaoB
+    611	0329  E8 FFD3			     call NAVIO_TITLE
+    612	032C  B8 0042			     mov ax, 'B'
+    613	032F  8B 4F 02			     mov cx, [bx+2]
+    614	0332  E8 FF56			     call LOAD_NAVIO
+    615	0335  BD 0253r			     mov bp, offset embarcacaoS
+    616	0338  E8 FFC4			     call NAVIO_TITLE
+    617	033B  B8 0053			     mov ax, 'S'
+    618	033E  8B 4F 04			     mov cx, [bx+4]
+    619	0341  E8 FF47			     call LOAD_NAVIO
+    620	0344  BD 0262r			     mov bp, offset embarcacaoD
+    621	0347  E8 FFB5			     call NAVIO_TITLE
+    622	034A  B8 0044			     mov ax, 'D'
+    623	034D  8B 4F 06			     mov cx, [bx+6]
+    624	0350  E8 FF38			     call LOAD_NAVIO
+    625	0353  BD 0271r			     mov bp, offset embarcacaoP
+    626	0356  E8 FFA6			     call NAVIO_TITLE
+    627	0359  B8 0050			     mov ax, 'P'
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 12
+b.ASM
+
+
+
+    628	035C  8B 4F 08			     mov cx, [bx+8]
+    629	035F  E8 FF29			     call LOAD_NAVIO
+    630
+    631	0362  5A			     pop dx
+    632	0363  59			     pop cx
+    633	0364  5B			     pop bx
+    634	0365  58			     pop ax
+    635	0366  C3			     ret
+    636	0367			     endp
+    637
+    638	0367			     REG_INT proc ; registra interrupcao
+    639	0367  1E			     push ds
+    640	0368  8C C8			     mov ax, cs
+    641	036A  8E D8			     mov ds, ax
+    642	036C  BA 037Dr			     mov dx, offset I6FH ; ds:dx rotina	do processamento(proc)
+    643	036F  B0 6F			     mov al, 6fh ; numero da interrupcao
+    644	0371  B4 25			     mov ah, 25h ; servico define vetor	da interrupcao
+    645	0373  CD 21			     int 21h
+    646	0375  1F			     pop ds
+    647
+    648					     ; configura ppa
+    649	0376  B0 8A			     mov al, 8ah ; configuracao	10001010b - modo 0, porta A = output, porta B =	input, porta+
+    650				     C-	= output, porta	C+ = input
+    651	0378  BA 0303			     mov dx, 0303h ; endereco da porta de controle
+    652	037B  EE			     out dx, al	; envia	configuracao para porta	de controle
+    653
+    654	037C  C3			     ret
+    655	037D			     endp
+    656
+    657				     ; Comunicacao paralela PPA	i8255A
+    658				     ; PA=300H PB=301H PC=302H PortControle=303H
+    659	037D			     I6FH proc ; int 6fh
+    660	037D  FB			     sti
+    661	037E  52			     push dx
+    662					     ; 1)jogador atual:	envia PC0 = 1, envia PC0 = 0 e envia coordenada	na porta A, espera  +
+    663				     retorno em	PC5-PC7
+    664					     ; 2)adversario: espera ate	PC4 = 0, le coordenada do adversario na	porta B, envia	    +
+    665				     retorno para PC1-PC3
+    666
+    667					     ; envia PC0 = 1
+    668	037F  3D 0000			     cmp ax, 0 ; opcao 0
+    669	0382  75 0A			     jnz I6FH_CONT_1
+    670	0384  BA 0302			     mov dx, 302h
+    671	0387  EC			     in	al, dx ; le porta C para manter	led do resultado anterior
+    672	0388  0C 01			     or	al, 0001b
+    673	038A  EE			     out dx, al	; envia	para porta C
+    674	038B  EB 3F 90			     jmp I6FH_FIM
+    675					     ; envia PC0 = 0 e envia coordenada	na porta A, le retorno em PC5-PC7
+    676	038E  3D 0001			     I6FH_CONT_1: cmp ax, 1 ; opcao 1
+    677	0391  75 16			     jnz I6FH_CONT_2
+    678	0393  8A C3			     mov al, bl	; bl tem coordenada do tiro
+    679	0395  BA 0300			     mov dx, 300h
+    680	0398  EE			     out dx, al	; envia	para porta A
+    681	0399  B0 00			     mov al, 0000b
+    682	039B  BA 0302			     mov dx, 302h
+    683	039E  EE			     out dx, al	; envia	para porta C-
+    684	039F  E8 0108			     call DELAY	; aguardar
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 13
+b.ASM
+
+
+
+    685	03A2  E8 0105			     call DELAY	; aguardar 2 segundos
+    686	03A5  EC			     in	al, dx ; le porta C+
+    687	03A6  EB 24 90			     jmp I6FH_FIM
+    688					     ; le PC4
+    689	03A9  3D 0002			     I6FH_CONT_2: cmp ax, 2 ; opcao 2
+    690	03AC  75 07			     jnz I6FH_CONT_3
+    691	03AE  BA 0302			     mov dx, 302h
+    692	03B1  EC			     in	al, dx ; le porta C
+    693	03B2  EB 18 90			     jmp I6FH_FIM
+    694					     ; le porta	B
+    695	03B5  3D 0003			     I6FH_CONT_3: cmp ax, 3 ; opcao 3
+    696	03B8  75 07			     jnz I6FH_CONT_4
+    697	03BA  BA 0301			     mov dx, 301h
+    698	03BD  EC			     in	al, dx ; le porta B
+    699	03BE  EB 0C 90			     jmp I6FH_FIM
+    700					     ; envia retorno para PC1-PC3
+    701	03C1  3D 0004			     I6FH_CONT_4: cmp ax, 4 ; opcao 4
+    702	03C4  75 06			     jnz I6FH_FIM
+    703	03C6  8A C3			     mov al, bl	; bl tem resposta do tiro adversario
+    704	03C8  BA 0302			     mov dx, 302h
+    705	03CB  EE			     out dx, al	; envia	para porta C
+    706
+    707	03CC				     I6FH_FIM:
+    708	03CC  5A			     pop dx
+    709	03CD  CF			     iret
+    710	03CE			     endp
+    711
+    712	03CE			     RESULT_CONT proc ;	atualiza display do resultado, posicao na tela em dx, endereco offset do    +
+    713				     contador em bx
+    714	03CE  50			     push ax
+    715	03CF  53			     push bx
+    716	03D0  52			     push dx
+    717	03D1  E8 FCC1			     call MOV_CURSOR
+    718	03D4  8A 07			     mov al, [bx]
+    719	03D6  32 E4			     xor ah, ah
+    720	03D8  B3 07			     mov bl, 7
+    721	03DA  E8 FC4A			     call ESC_INT_21
+    722	03DD  5A			     pop dx
+    723	03DE  5B			     pop bx
+    724	03DF  58			     pop ax
+    725	03E0  C3			     ret
+    726	03E1			     endp
+    727
+    728	03E1			     ESC_PORTA_C proc ;	escreve	no campo Porta C, recebe de al
+    729	03E1  52			     push dx
+    730
+    731	03E2  BA 1619			     mov dx, 1619h ; coordenada	campo Porta C
+    732	03E5  E8 FCAD			     call MOV_CURSOR
+    733	03E8  8A D0			     mov dl, al
+    734	03EA  E8 FC5B			     call WRITE_HEX
+    735
+    736	03ED  5A			     pop dx
+    737	03EE  C3			     ret
+    738	03EF			     endp
+    739
+    740	03EF			     TIRO_ENVIA	proc
+    741	03EF  50			     push ax
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 14
+b.ASM
+
+
+
+    742	03F0  53			     push bx
+    743	03F1  51			     push cx
+    744	03F2  52			     push dx
+    745
+    746	03F3  BD 0316r			     mov bp, offset mensagemTiroEnvia ;	escreve	mensagem
+    747	03F6  E8 FE48			     call ESC_MENSAGEM
+    748
+    749	03F9  B8 0000			     mov ax, 0 ; envia 1 para PC0
+    750	03FC  CD 6F			     int 6fh
+    751	03FE  BA 1632			     TIRO_ENVIA_INICIO:	mov dx,	1632h ;	posicao	22 x 50
+    752	0401  E8 FC91				     call MOV_CURSOR
+    753	0404  E8 FC70				     call LE_CHAR
+    754	0407  3C 30				     cmp al, '0' ; verifica se o numero	eh menor que 0
+    755	0409  7C 18				     jl	TIRO_ENVIA_ERRO
+    756	040B  3C 39				     cmp al, '9' ; verifica se o numero	eh maior que 9
+    757	040D  7F 14				     jg	TIRO_ENVIA_ERRO
+    758	040F  2C 30				     sub al, '0' ; transforma em numero
+    759	0411  8A D8				     mov bl, al	; salva	linha
+    760	0413  FE C2				     inc dl
+    761	0415  E8 FC5F				     call LE_CHAR
+    762	0418  3C 30				     cmp al, '0'
+    763	041A  7C 07				     jl	TIRO_ENVIA_ERRO
+    764	041C  3C 39				     cmp al, '9'
+    765	041E  7F 03				     jg	TIRO_ENVIA_ERRO
+    766	0420  EB 09 90				     jmp TIRO_VERIFICA_CONTINUA
+    767	0423  BD 02E4r				     TIRO_ENVIA_ERRO: mov bp, offset mensagemErroTiroEnvia
+    768	0426  E8 FE18				     call ESC_MENSAGEM
+    769	0429  EB D3			     jmp TIRO_ENVIA_INICIO
+    770	042B				     TIRO_VERIFICA_CONTINUA:
+    771	042B  2C 30			     sub al, '0' ; transforma em numero
+    772	042D  8A E3			     mov ah, bl
+    773	042F  50			     push ax ; salva coordenadas reais
+    774	0430  80 C3 04			     add bl, 4 ; base
+    775	0433  B4 02			     mov ah, 2
+    776	0435  F6 E4			     mul ah ; deslocamento x2
+    777	0437  04 03			     add al, 3 ; base
+    778
+    779	0439  8A D0			     mov dl, al	; salva	coordenada
+    780	043B  8A F3			     mov dh, bl
+    781
+    782	043D  58			     pop ax
+    783	043E  8A DC			     mov bl, ah	; coordenada x
+    784	0440  D0 E3 D0 E3 D0 E3	D0+	     shl bl, 4
+    785	      E3
+    786	0448  02 D8			     add bl, al	; coordenada y
+    787					     ;mov bl, 00100011b	; TESTE
+    788	044A  B8 0001			     mov ax, 1 ; envia coordenada para PA e retorna o resultado
+    789	044D  CD 6F			     int 6fh
+    790					     ;mov al, 01100000b	; TESTE
+    791	044F  E8 FF8F			     call ESC_PORTA_C ;	escreve	no campo Porta C o valor de al
+    792	0452  52			     push dx ; salva posicao do	tiro para escrever depois
+    793	0453  8A D0			     mov dl, al	; pc, pc5 = 1: acertou navio; pc6 = 1: afundou navio; pc7 = 1: terminou	jogo+
+    794				     (voce ganhou)
+    795
+    796	0455  D0 CA D0 CA D0 CA	D0+	     ror dl, 6 ; pega bit 5 da direita e joga em cf
+    797	      CA D0 CA D0 CA
+    798	0461  72 07			     jc	TIRO_ACERTOU
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 15
+b.ASM
+
+
+
+    799	0463  B0 78			     mov al, 'x' ; caracter tiro erro
+    800	0465  B3 04			     mov bl, 4 ; cor vermelha
+    801	0467  EB 18 90			     jmp TIRO_ERROU
+    802
+    803	046A  B0 6F			     TIRO_ACERTOU: mov al, 'o'
+    804	046C  B3 02			     mov bl, 2 ; cor verde
+    805	046E  FE 06 03E9r		     inc resAcertos ; incrementa os acertos
+    806
+    807	0472  D0 CA			     ror dl, 1;	verifica pc6: afundou navio
+    808	0474  73 04			     jnc NAVIO_NAO_AFUNDOU
+    809	0476  FE 06 03EAr		     inc resAfundados ;	incrementa os afundados
+    810
+    811	047A				     NAVIO_NAO_AFUNDOU:
+    812	047A  D0 CA			     ror dl, 1;	verifica pc7: termina jogo
+    813	047C  73 03			     jnc TIRO_ERROU ; continua jogo
+    814	047E  E8 015C			     call END_GAME_WIN
+    815
+    816	0481  5A			     TIRO_ERROU: pop dx	; recupera posicao do tiro
+    817
+    818	0482  E8 FC10			     call MOV_CURSOR
+    819	0485  E8 FC18			     call ESC_CHAR ; escreve o caracter	se errou ou acertou
+    820
+    821	0488  FE 06 03E8r		     inc resTiros ; incrementa contador	de tiro
+    822	048C  BB 03E8r			     mov bx, offset resTiros ; contador	de tiros
+    823	048F  BA 0441			     mov dx, 0441h
+    824	0492  E8 FF39			     call RESULT_CONT
+    825	0495  BB 03E9r			     mov bx, offset resAcertos ; contador de acertos
+    826	0498  FE C6			     inc dh
+    827	049A  E8 FF31			     call RESULT_CONT
+    828	049D  BB 03EAr			     mov bx, offset resAfundados ; contador de afundados
+    829	04A0  FE C6			     inc dh
+    830	04A2  E8 FF29			     call RESULT_CONT
+    831
+    832	04A5  5A			     pop dx
+    833	04A6  59			     pop cx
+    834	04A7  5B			     pop bx
+    835	04A8  58			     pop ax
+    836	04A9  C3			     ret
+    837	04AA			     endp
+    838
+    839	04AA			     DELAY proc	; delay	de 1 segundo
+    840	04AA  50			     push ax
+    841	04AB  53			     push bx
+    842	04AC  51			     push cx
+    843	04AD  52			     push dx
+    844	04AE  B4 00			     mov ah, 0 ; funcao	0 retorna em cx:dx contagem de tiques. Frequencia de 18,2	    +
+    845				     clock/segundo
+    846	04B0  CD 1A			     int 1ah ; pega o tempo de contagem	de dias
+    847	04B2  83 C2 12			     add dx, 18	; adicionar um atraso de 1 segundo(18 clocks/seg) a palavra baixa
+    848	04B5  8B DA			     mov bx, dx
+    849	04B7  CD 1A			     DELAY_LACO: int 1ah
+    850	04B9  3B D3				     cmp dx, bx
+    851	04BB  75 FA			     jne DELAY_LACO
+    852	04BD  5A			     pop dx
+    853	04BE  59			     pop cx
+    854	04BF  5B			     pop bx
+    855	04C0  58			     pop ax
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 16
+b.ASM
+
+
+
+    856	04C1  C3			     ret
+    857	04C2			     endp
+    858
+    859	04C2			     TIRO_RECEBE proc
+    860	04C2  50			     push ax
+    861	04C3  53			     push bx
+    862	04C4  51			     push cx
+    863	04C5  52			     push dx
+    864
+    865	04C6  BD 0348r			     mov bp, offset mensagemTiroRecebe ; escreve mensagem
+    866	04C9  E8 FD75			     call ESC_MENSAGEM
+    867
+    868	04CC  BA 0007			     TIROR_CHECK: mov dx, 7h ; beep 7h ascii
+    869	04CF  E8 FB47				     call ESC_CHAR_21
+    870	04D2  E8 FFD5				     call DELAY
+    871	04D5  B8 0002				     mov ax, 2 ; retorna PC, para verificar PC4	= 0
+    872	04D8  CD 6F				     int 6fh
+    873						     ;mov al, 00000000b	; TESTE	; 00010000b = aguarda
+    874	04DA  E8 FF04				     call ESC_PORTA_C ;	escreve	no campo Porta C o valor de al
+    875	04DD  D0 E8 D0 E8 D0 E8	D0+		     shr al, 5 ; joga bit 4 no carry flag
+    876	      E8 D0 E8
+    877	04E7  72 E3			     jc	TIROR_CHECK ; PC4 = 1, adversario pensando
+    878
+    879	04E9  B8 0003			     mov ax, 3 ; retorna PB em al, com as coordenadas do tiro do adversario, 4 bits para x e+
+    880				     4 para y
+    881	04EC  CD 6F			     int 6fh
+    882					     ;mov al, 56h ; TESTE
+    883
+    884	04EE  BA 1601			     mov dx, 1601h ; coordenada	campo Porta B
+    885	04F1  E8 FBA1			     call MOV_CURSOR ; move cursor para	campo porta b
+    886	04F4  8A D0			     mov dl, al
+    887	04F6  E8 FB4F			     call WRITE_HEX ; escreve valor de al que vem da PB
+    888	04F9  BA 0D41			     mov dx, 0d41h ; coordenada	resultado ultimo tiro
+    889	04FC  E8 FB96			     call MOV_CURSOR ; move cursor para	campo ultimo tiro
+    890	04FF  8A D0			     mov dl, al
+    891	0501  E8 FB44			     call WRITE_HEX ; escreve valor de al que vem da PB
+    892
+    893	0504  D1 C8 D1 C8 D1 C8	D1+	     ror ax, 4 ; al = linha
+    894	      C8
+    895	050C  D0 EC D0 EC D0 EC	D0+	     shr ah, 4 ; ah = coluna
+    896	      EC
+    897	0514  04 04			     add al, 4 ; base
+    898	0516  8A F0			     mov dh, al
+    899	0518  8A C4			     mov al, ah
+    900	051A  B4 02			     mov ah, 2
+    901	051C  F6 E4			     mul ah ; deslocamento x2
+    902	051E  04 1B			     add al, 27	; base
+    903	0520  8A D0			     mov dl, al
+    904
+    905	0522  E8 FB70			     call MOV_CURSOR ; vai para	posicao	do tiro
+    906	0525  E8 FB64			     call LE_CHAR_VIDEO
+    907	0528  3C 20			     cmp al, ' ' ; se nao tiver	caracter adversario errou o tiro
+    908	052A  75 05			     jnz TIROR_ACERTOU
+    909	052C  B0 FE			     mov al, 254 ; se errou escreve quadrado vermelho
+    910	052E  EB 60 90			     jmp TIROR_CONTINUA
+    911	0531  80 FC 04			     TIROR_ACERTOU: cmp	ah, 4 ;	verificar se ja	atirou nessa posicao
+    912	0534  74 5A			     jz	TIROR_CONTINUA ; se for	caracter for vermelho adversario ja atirou na posicao
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 17
+b.ASM
+
+
+
+    913	0536  3C 41			     cmp al, 'A'
+    914	0538  74 10			     jz	ACERTOU_A
+    915	053A  3C 42			     cmp al, 'B'
+    916	053C  74 16			     jz	ACERTOU_B
+    917	053E  3C 53			     cmp al, 'S'
+    918	0540  74 1C			     jz	ACERTOU_S
+    919	0542  3C 44			     cmp al, 'D'
+    920	0544  74 22			     jz	ACERTOU_D
+    921	0546  3C 50			     cmp al, 'P'
+    922	0548  74 28			     jz	ACERTOU_P
+    923	054A  FF 0E 03DEr		     ACERTOU_A:	dec lengthA
+    924	054E  BB 03DEr			     mov bx, offset lengthA
+    925	0551  EB 26 90			     jmp ACERTOU_CONTINUA
+    926	0554  FF 0E 03E0r		     ACERTOU_B:	dec lengthB
+    927	0558  BB 03E0r			     mov bx, offset lengthB
+    928	055B  EB 1C 90			     jmp ACERTOU_CONTINUA
+    929	055E  FF 0E 03E2r		     ACERTOU_S:	dec lengthS
+    930	0562  BB 03E2r			     mov bx, offset lengthS
+    931	0565  EB 12 90			     jmp ACERTOU_CONTINUA
+    932	0568  FF 0E 03E4r		     ACERTOU_D:	dec lengthD
+    933	056C  BB 03E4r			     mov bx, offset lengthD
+    934	056F  EB 08 90			     jmp ACERTOU_CONTINUA
+    935	0572  FF 0E 03E6r		     ACERTOU_P:	dec lengthP
+    936	0576  BB 03E6r			     mov bx, offset lengthP
+    937
+    938	0579  8B 17			     ACERTOU_CONTINUA: mov dx, [bx]
+    939	057B  32 E4			     xor ah, ah	; limpa	ah e armazena resultado	para enviar para pc3 da	ppa
+    940	057D  83 FA 00			     cmp dx, 0
+    941	0580  75 07			     jnz AFUNDOU_CONTINUA ; se nao afundou o navio
+    942	0582  FE 06 03EDr		     inc resAdvAfundados
+    943	0586  80 CC 04			     or	ah, 0100b ; bit	2 afundou navio
+    944	0589  FE 06 03ECr		     AFUNDOU_CONTINUA: inc resAdvAcertos ; incrementa contador de acertos do adversario
+    945	058D  80 CC 02			     or	ah, 0010b ; bit	1 acertou navio
+    946	0590  B3 04			     TIROR_CONTINUA: mov bl, 4 ; cor vermelha
+    947
+    948	0592  E8 FB0B			     call ESC_CHAR
+    949
+    950	0595  FE 06 03EBr		     inc resAdvTiros ; incrementa contador de tiro
+    951	0599  BB 03EBr			     mov bx, offset resAdvTiros	; contador de tiros
+    952	059C  BA 0A41			     mov dx, 0a41h
+    953	059F  E8 FE2C			     call RESULT_CONT
+    954	05A2  BB 03ECr			     mov bx, offset resAdvAcertos ; contador de	acertos
+    955	05A5  FE C6			     inc dh
+    956	05A7  E8 FE24			     call RESULT_CONT
+    957	05AA  BB 03EDr			     mov bx, offset resAdvAfundados ; contador de afundados
+    958	05AD  FE C6			     inc dh
+    959	05AF  E8 FE1C			     call RESULT_CONT
+    960
+    961	05B2  8A 07			     mov al, [bx] ; pega o contador de navios afundados
+    962	05B4  3C 05			     cmp al, 5 ; compara se ja afundou todas navios
+    963	05B6  7C 03			     jl	NAO_TERMINOU_JOGO ; se for menor q 5 continua jogo
+    964	05B8  80 CC 08			     or	ah, 1000b ; bit	3 terminou jogo(voce ganhou)
+    965	05BB  8A DC			     NAO_TERMINOU_JOGO:	mov bl,	ah ; pc, pc1 = 1: acertou navio; pc2 = 1: afundou navio; pc3+
+    966				     = 1: terminou jogo(voce ganhou)
+    967					     ;mov bl, 00001110b	; TESTE
+    968	05BD  B8 0004			     mov ax, 4 ; envia retorno de bl para PC1-PC3
+    969	05C0  CD 6F			     int 6fh
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 18
+b.ASM
+
+
+
+    970
+    971	05C2  D0 EB D0 EB D0 EB	D0+	     shr bl, 4 ; verifica se terminou jogo
+    972	      EB
+    973	05CA  73 03			     jnc TIROR_FIM
+    974	05CC  E8 0018			     call END_GAME_DEFEAT ; termina o jogo e voce perdeu
+    975
+    976	05CF				     TIROR_FIM:
+    977	05CF  5A			     pop dx
+    978	05D0  59			     pop cx
+    979	05D1  5B			     pop bx
+    980	05D2  58			     pop ax
+    981	05D3  C3			     ret
+    982	05D4			     endp
+    983
+    984	05D4			     INIT_GAME proc ; inicia o jogo, solicitando quem comeca
+    985	05D4  E8 FE18			     RODADAS: call TIRO_ENVIA
+    986	05D7  E8 FEE8				     call TIRO_RECEBE
+    987	05DA  EB F8			     jmp RODADAS
+    988	05DC  C3			     ret
+    989	05DD			     endp
+    990
+    991	05DD			     END_GAME_WIN proc
+    992	05DD  BD 037Ar			     mov bp, offset mensagemEndGameGanhou
+    993	05E0  E8 FC5E			     call ESC_MENSAGEM
+    994	05E3  E8 000B			     call END_GAME
+    995	05E6  C3			     ret
+    996	05E7			     endp
+    997
+    998	05E7			     END_GAME_DEFEAT proc
+    999	05E7  BD 03ACr			     mov bp, offset mensagemEndGamePerdeu
+   1000	05EA  E8 FC54			     call ESC_MENSAGEM
+   1001	05ED  E8 0001			     call END_GAME
+   1002	05F0  C3			     ret
+   1003	05F1			     endp
+   1004
+   1005	05F1			     END_GAME proc
+   1006	05F1  B9 0003			     mov cx, 3 ; contagem de 3 segundos	e sair
+   1007	05F4  E8 FEB3			     END_GAME_CONT: call DELAY
+   1008	05F7  E2 FB			     loop END_GAME_CONT
+   1009	05F9  E8 FA04			     call EXIT
+   1010	05FC			     endp
+   1011
+   1012	05FC  B8 0000s		     INICIO: mov ax, @data ; carrega valor inicial da stack
+   1013	05FF  8E D8			     mov ds, ax
+   1014	0601  E8 FA7F			     call DEFINE_MODO
+   1015	0604  B0 01			     mov al, 1
+   1016	0606  E8 FA73			     call MUDA_PAGINA ;	usa pagina 1
+   1017	0609  E8 FD5B			     call REG_INT
+   1018	060C  E8 FB16			     call PRINT_TABLES
+   1019	060F  E8 FCFF			     call INIT_NAVIOS
+   1020	0612  E8 FFBF			     call INIT_GAME
+   1021	0615  E8 F9E8			     call EXIT
+   1022				     end INICIO
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 19
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "20/06/12"
+??FILENAME			  Text	 "b	  "
+??TIME				  Text	 "18:44:33"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 B
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ACERTOU_A			  Near	 _TEXT:054A
+ACERTOU_B			  Near	 _TEXT:0554
+ACERTOU_CONTINUA		  Near	 _TEXT:0579
+ACERTOU_D			  Near	 _TEXT:0568
+ACERTOU_P			  Near	 _TEXT:0572
+ACERTOU_S			  Near	 _TEXT:055E
+AFUNDOU_CONTINUA		  Near	 _TEXT:0589
+BORDAIV1			  Near	 _TEXT:01C4
+BORDAV1				  Near	 _TEXT:00E9
+DEFINE_MODO			  Near	 _TEXT:0083
+DELAY				  Near	 _TEXT:04AA
+DELAY_LACO			  Near	 _TEXT:04B7
+DIVIDE				  Near	 _TEXT:0030
+EMBARCACAOA			  Byte	 DGROUP:0235
+EMBARCACAOB			  Byte	 DGROUP:0244
+EMBARCACAOD			  Byte	 DGROUP:0262
+EMBARCACAOP			  Byte	 DGROUP:0271
+EMBARCACAOS			  Byte	 DGROUP:0253
+EMPTY				  Byte	 DGROUP:0220
+END_GAME			  Near	 _TEXT:05F1
+END_GAME_CONT			  Near	 _TEXT:05F4
+END_GAME_DEFEAT			  Near	 _TEXT:05E7
+END_GAME_WIN			  Near	 _TEXT:05DD
+ESC_CHAR			  Near	 _TEXT:00A0
+ESC_CHAR_21			  Near	 _TEXT:0019
+ESC_INT_21			  Near	 _TEXT:0027
+ESC_MENSAGEM			  Near	 _TEXT:0241
+ESC_PORTA_C			  Near	 _TEXT:03E1
+ESC_STRING			  Near	 _TEXT:00B2
+ESC_STRING_21			  Near	 _TEXT:0020
+EXIT				  Near	 _TEXT:0000
+HEX_LETTER			  Near	 _TEXT:006A
+I6FH				  Near	 _TEXT:037D
+I6FH_CONT_1			  Near	 _TEXT:038E
+I6FH_CONT_2			  Near	 _TEXT:03A9
+I6FH_CONT_3			  Near	 _TEXT:03B5
+I6FH_CONT_4			  Near	 _TEXT:03C1
+I6FH_FIM			  Near	 _TEXT:03CC
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 20
+Symbol Table
+
+
+
+INICIO				  Near	 _TEXT:05FC
+INIT_GAME			  Near	 _TEXT:05D4
+INIT_NAVIOS			  Near	 _TEXT:0311
+LACO2				  Near	 _TEXT:003D
+LENGTHA				  Word	 DGROUP:03DE
+LENGTHB				  Word	 DGROUP:03E0
+LENGTHD				  Word	 DGROUP:03E4
+LENGTHP				  Word	 DGROUP:03E6
+LENGTHS				  Word	 DGROUP:03E2
+LE_CHAR				  Near	 _TEXT:0077
+LE_CHAR_SEM_ECO			  Near	 _TEXT:0072
+LE_CHAR_VIDEO			  Near	 _TEXT:008C
+LOAD_NAVIO			  Near	 _TEXT:028B
+LOAD_NAVIO_CONTINUA		  Near	 _TEXT:02CC
+LOAD_NAVIO_ERRO			  Near	 _TEXT:028F
+LOAD_NAVIO_VERIFICA		  Near	 _TEXT:0253
+LOAD_NAVIO_VERIFICA_ERRO	  Near	 _TEXT:0286
+LOAD_NAVIO_VERIFICA_FIM		  Near	 _TEXT:0287
+MATRIZ_LACOI			  Near	 _TEXT:0224
+MATRIZ_LACOJ			  Near	 _TEXT:022A
+MENSAGEMENDGAMEGANHOU		  Byte	 DGROUP:037A
+MENSAGEMENDGAMEPERDEU		  Byte	 DGROUP:03AC
+MENSAGEMERROLOADNAVIOLIMITE	  Byte	 DGROUP:02B2
+MENSAGEMERROLOADNAVIOPOSICAO	  Byte	 DGROUP:0280
+MENSAGEMERROTIROENVIA		  Byte	 DGROUP:02E4
+MENSAGEMTIROENVIA		  Byte	 DGROUP:0316
+MENSAGEMTIRORECEBE		  Byte	 DGROUP:0348
+MOV_CURSOR			  Near	 _TEXT:0095
+MUDA_PAGINA			  Near	 _TEXT:007C
+NAO_TERMINOU_JOGO		  Near	 _TEXT:05BB
+NAVIO_FIM			  Near	 _TEXT:02FA
+NAVIO_HORIZONTAL		  Near	 _TEXT:02DE
+NAVIO_HORIZONTAL_VER		  Near	 _TEXT:0263
+NAVIO_NAO_AFUNDOU		  Near	 _TEXT:047A
+NAVIO_TITLE			  Near	 _TEXT:02FF
+NAVIO_VERTICAL			  Near	 _TEXT:02EE
+NAVIO_VERTICAL_VER		  Near	 _TEXT:0275
+PRINT_CONTENT_MATRIZ		  Near	 _TEXT:0219
+PRINT_TABLE			  Near	 _TEXT:00C3
+PRINT_TABLES			  Near	 _TEXT:0125
+QUEBRA_LINHA			  Near	 _TEXT:000A
+REG_INT				  Near	 _TEXT:0367
+RESACERTOS			  Byte	 DGROUP:03E9
+RESADVACERTOS			  Byte	 DGROUP:03EC
+RESADVAFUNDADOS			  Byte	 DGROUP:03ED
+RESADVTIROS			  Byte	 DGROUP:03EB
+RESAFUNDADOS			  Byte	 DGROUP:03EA
+RESTIROS			  Byte	 DGROUP:03E8
+RESULTADOACERTOS		  Byte	 DGROUP:00D0
+RESULTADOAFUNDADOS		  Byte	 DGROUP:00E5
+RESULTADOTIROS			  Byte	 DGROUP:00BB
+RESULTADOTITLE1			  Byte	 DGROUP:00A6
+RESULTADOTITLE2			  Byte	 DGROUP:00FA
+RESULTADOULTTIRO		  Byte	 DGROUP:010F
+RESULT_CONT			  Near	 _TEXT:03CE
+RODADAS				  Near	 _TEXT:05D4
+TABLEBOTTOM			  Byte	 DGROUP:0076
+Turbo Assembler	 Version 4.1	    20/06/12 18:44:33	    Page 21
+Symbol Table
+
+
+
+TABLEDOWNBOTTOM			  Byte	 DGROUP:016C
+TABLEDOWNMIDDLE			  Byte	 DGROUP:01B4
+TABLEDOWNTOP			  Byte	 DGROUP:0124
+TABLENUMBERLINE			  Byte	 DGROUP:0060
+TABLETITLENAVIOS		  Byte	 DGROUP:0030
+TABLETITLERES			  Byte	 DGROUP:008E
+TABLETITLETIROS			  Byte	 DGROUP:0018
+TABLETOP1			  Byte	 DGROUP:0000
+TABLETOP2			  Byte	 DGROUP:0048
+TIROR_ACERTOU			  Near	 _TEXT:0531
+TIROR_CHECK			  Near	 _TEXT:04CC
+TIROR_CONTINUA			  Near	 _TEXT:0590
+TIROR_FIM			  Near	 _TEXT:05CF
+TIRO_ACERTOU			  Near	 _TEXT:046A
+TIRO_ENVIA			  Near	 _TEXT:03EF
+TIRO_ENVIA_ERRO			  Near	 _TEXT:0423
+TIRO_ENVIA_INICIO		  Near	 _TEXT:03FE
+TIRO_ERROU			  Near	 _TEXT:0481
+TIRO_RECEBE			  Near	 _TEXT:04C2
+TIRO_VERIFICA_CONTINUA		  Near	 _TEXT:042B
+TITLEMENSAGEM			  Byte	 DGROUP:01FC
+TITLEPORTAB			  Byte	 DGROUP:0205
+TITLEPORTAC			  Byte	 DGROUP:020E
+TITLETIRO			  Byte	 DGROUP:0217
+WRITE_DIGIT			  Near	 _TEXT:006D
+WRITE_HEX			  Near	 _TEXT:0048
+WRITE_HEX_DIGIT			  Near	 _TEXT:005F
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  03EE Word	  Public  DATA
+_TEXT				  16  0618 Word	  Public  CODE
+

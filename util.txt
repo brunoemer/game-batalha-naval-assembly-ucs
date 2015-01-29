@@ -1,0 +1,24 @@
+;acessar ppa
+mov dx, 300h ; mais de 8 bits, usar dx e depois al(nao usar in al,300h)
+in al, dx
+
+;enderecos ppa portas
+a -> 300h
+b -> 301h
+c -> 302h
+controle -> 303h
+
+
+;batalha naval
+posicao x - y; (v - h)vertical ou horizontal
+verificar sobreposicao e limites da matriz 10x10
+
+
+;usar interrupcao para pegar segundo
+
+
+;interrupcao do caracter ascii 7
+
+
+;ppa envia pela porta A e recebe pela porta B
+
